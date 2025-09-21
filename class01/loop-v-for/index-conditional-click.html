@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue v-if with Click Event</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      /* display: flex; */
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f2f5;
+      margin: 0;
+    }
+    #app {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 400px;
+    }
+    .buttons {
+      margin: 1.5rem 0;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #e9e9e9;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #dcdcdc;
+    }
+    .status-box {
+      padding: 20px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      transition: background-color 0.3s ease;
+    }
+    .active { background-color: #4caf50; /* Green */ }
+    .pending { background-color: #ff9800; /* Orange */ }
+    .inactive { background-color: #f44336; /* Red */ }
+  </style>
+</head>
+<body>
+<h1>Vue v-if with Click Event</h1>
+  <div id="app">
+    <h2>User Status Example</h2>
+    <p>Click the buttons to change the user's status.</p>
+
+    <div class="buttons">
+      <!-- The @click directive calls our 'setStatus' method with a new value -->
+      <button @click="setStatus('active')">Set Active</button>
+      <button @click="setStatus('pending')">Set Pending</button>
+      <button @click="setStatus('inactive')">Set Inactive</button>
+    </div>
+
+    <!-- 
+      This is the conditional block. Vue will only render ONE of these divs
+      based on the current value of the 'status' variable.
+    -->
+    <div v-if="status === 'active'" class="status-box active">
+      <p>Status: Active</p>
+      <span>User is online and ready.</span>
+    </div>
+
+    <div v-else-if="status === 'pending'" class="status-box pending">
+      <p>Status: Pending</p>
+      <span>User account is awaiting approval.</span>
+    </div>
+
+    <div v-else class="status-box inactive">
+      <p>Status: Inactive</p>
+      <span>User account is disabled.</span>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+      setup() {
+        // 1. Create a reactive variable 'status' with a default value.
+        const status = ref('active');
+
+        // 2. Create a method to change the value of 'status'.
+        // This method is called by the @click events in the template.
+        const setStatus = (newStatus) => {
+          status.value = newStatus;
+        };
+
+        // 3. Expose the variable and the method to the template.
+        return {
+          status,
+          setStatus
+        };
+      }
+    }).mount('#app');
+  </script>
+
+</body>
+</html>

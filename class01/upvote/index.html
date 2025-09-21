@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.3/css/bulma.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.0.6/css/all.css"
+    />
+    <link rel="stylesheet" href="../public/styles.css" />
+  </head>
+
+  <body>
+    <div id="app">      
+      <h2 class="title has-text-centered dividing-header">UpVote!</h2>
+      <div class="section">
+        <article class="media" v-for="submission in sortedSubmissions" :key="submission.id">
+          <figure class="media-left">
+            <img
+              class="image is-64x64"
+               v-bind:src="submission.submissionImage"
+            />
+          </figure>
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <strong>
+                  <a  v-bind:href="" class="has-text-info">
+                     {{ submission.title }}
+                  </a>
+                  <span class="tag is-small">#{{ submission.id }}</span>
+                </strong>
+                <br />
+                {{ submission.description }}
+                <br />
+                <small class="is-size-7">
+                  Submitted by:
+                  <img
+                    class="image is-24x24"
+                     v-bind:src="submission.avatar"
+                  />
+                </small>
+              </p>
+            </div>
+          </div>
+          <div class="media-right">
+            <span class="icon is-small">
+              <i class="fa fa-chevron-up"></i>
+              <strong class="has-text-info">{{ submission.votes }}</strong>
+            </span>
+          </div>
+        </article>
+      </div>
+      <hr>
+      <div class="section">
+        <h3>Products</h3>
+        <div class="columns is-multiline">
+          <div v-for="product in products" :key="product.id" class="column is-one-third">
+            <article class="media box">
+              <figure class="media-left">
+                <img
+                  class="image is-64x64"
+                  :src="product.thumbnail"
+                />
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <p>
+                    <strong>
+                      <a :href="`https://dummyjson.com/products/${product.id}`" class="has-text-info">
+                        {{ product.title }}
+                      </a>
+                    </strong>
+                    <br />
+                    {{ product.description }}
+                    <br />
+                    <small class="is-size-7">
+                      Price: {{ product.price }}
+                    </small>
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <script src="https://unpkg.com/vue"></script> -->
+     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./seed.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>
