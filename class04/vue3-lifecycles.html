@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <h1 :style="headstyles">{{message}}</h1>
+    </div>
+    <pre>
+        Vue 3 has the same logical phases as Vue 2, but the preferred way is using Composition API lifecycle hooks instead of Options API methods.
+
+🔹 Vue 3 Lifecycle Phases & Hooks
+1. Creation Phase
+
+beforeCreate (legacy, not commonly used in Vue 3)
+
+created (legacy, not commonly used in Vue 3)
+👉 In Vue 3, we usually don’t rely on these; we use setup() instead, since it runs before the component is created.
+
+2. Mounting Phase
+
+onBeforeMount → runs before the initial DOM render.
+
+onMounted → runs after the component is inserted into the DOM.
+
+Best place for DOM-related logic (e.g., fetching data, initializing charts, focusing input).
+
+3. Updating Phase (runs whenever reactive state changes)
+
+onBeforeUpdate → called before DOM re-render/patch.
+
+onUpdated → called after the DOM has been updated.
+
+Best for watching or reacting to DOM updates.
+
+4. Unmounting Phase
+
+onBeforeUnmount → runs before the component is unmounted.
+
+Cleanup tasks: remove event listeners, cancel intervals, abort fetch requests.
+
+onUnmounted → runs after the component is removed from the DOM.
+
+5. Other Specialized Hooks
+
+onErrorCaptured() → Captures errors from descendant components. Useful for error logging or displaying an error message.
+
+onRenderTracked() (Dev-only) → Runs when a reactive dependency is tracked. Useful for debugging which dependencies are causing re-renders.
+
+onRenderTriggered() (Dev-only) → Runs when a dependency change triggers a re-render. Helps identify what state change is causing an update.
+
+onActivated() & onDeactivated() → Used with `<KeepAlive>` components.
+    - `onActivated` is called when a cached component is inserted into the DOM.
+    - `onDeactivated` is called when it's removed.
+
+onServerPrefetch() (SSR-only) → An `async` hook that runs on the server before the component is rendered, allowing for data pre-fetching.
+    </pre>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    message: 'Hello Vue!',
+                    headstyles: {
+                        color: 'red',
+                        textAlign: 'center'
+                    }
+                }
+            },
+            beforeCreate() {
+                console.log('beforeCreate');
+            },
+            created() {
+                console.log('created');
+            },
+            beforeMount() {
+                console.log('beforeMount');
+            },
+            mounted() {
+                console.log('mounted');
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

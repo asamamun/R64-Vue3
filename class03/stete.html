@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue v-for Example (Options API)</title>
+  <!-- 1. Include Vue from a CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+    }
+    #app {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #1c3d5a;
+      padding-bottom: 0.5rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      border-bottom: 2px solid #eef;
+    }
+    form {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    input {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background: #f9f9f9;
+      padding: 0.75rem;
+      border-bottom: 1px solid #e7e7e7;
+    }
+    li:last-child {
+      border-bottom: none;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: #e7e7e7;
+      margin: 2rem 0;
+    }
+    .row {
+      display: flex;
+      gap: 2rem;
+    }
+    .column {
+      flex: 1;
+    }
+    .column h2 {
+      margin-top: 0;
+    }
+
+  </style>
+  </head>
+<body>
+  <!-- This is where your Vue app will be mounted -->
+<div id="app">
+
+</div>
+<pre>
+  who is creating this event in this.$emit('add-item', this.itemValue);
+
+stete.html
+:130
+I'll explain exactly which component creates that event, when it happens, and how the value flows to the parent.
+
+Quick trace (what happens and who does it)
+
+The user submits the form in the formComponent (the <form @submit.prevent="handleItemSubmit">).
+handleItemSubmit() runs inside the formComponent instance.
+Inside that method the line this.$emit('add-item', this.itemValue) is executed — so the formComponent (the child) is the emitter/creator of the custom event 'add-item'.
+The payload is this.itemValue (the current string from the input).
+The parent maincomponent listens for that event: &lt;form-component @add-item="addTheItemFromChildComponent" ...>. Its method addTheItemFromChildComponent(newItem) receives the payload and pushes it into this.items.
+Key points
+
+this inside handleItemSubmit() is the child component instance (formComponent), so the child calls $emit.
+This is a Vue component custom event (not a native DOM event). The parent receives it because of the @add-item listener.
+The event is created/emitted when the user submits the child form (triggering the child method).
+If you want, I can:
+
+Show the exact lines in stete.html annotated.
+Convert the event name or payload to a more explicit object (e.g., { value: ... }) for future-proofing.
+</pre>
+<script>
+    // 2. Create a Vue application
+    const { createApp } = Vue;
+    //createApp({object}).mount('#app');
+    const app = createApp();
+    const formComponent = {
+        template: `
+            <div class="row">
+                <div class="column">
+                    <h2>Add Item</h2>
+                    <form @submit.prevent="handleItemSubmit">
+                        <input v-model="itemValue" placeholder="Enter Item" />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+
+                <div class="column">
+                    <h2>Add Number</h2>
+                    <form @submit.prevent="handleSubmit">
+                        <input v-model="inputValue" placeholder="Enter Number" />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        `,
+        data() {
+            return {
+                itemValue: 'q',
+                inputValue: '6'
+            };
+        },
+        methods: {
+            handleItemSubmit() {
+                // enter the item into maincomponents items array
+                this.$emit('add-item', this.itemValue);
+                this.itemValue = '';
+            },
+            handleSubmit() {
+                // enter the number into maincomponents numbers array
+                this.$emit('add-number', this.inputValue);
+                this.inputValue = '';
+            }
+            
+        }
+    }
+    const itemComponent = {
+        props: ['item'],
+        template: `<ul>
+            <li v-for="(item, index) in items" :key="index">{{ item }}</li>
+            </ul>`,
+        data() {
+            return {
+                items: this.$props.item //this is anti-pattern, better to use props directly in template
+            }
+        }
+    }
+    const numberComponent = {
+        props: ['number'],
+        template: `<ul>
+            <li v-for="(num, index) in number" :key="index">{{ num }} - {{ index }}</li>
+            </ul>`
+    }
+    const maincomponent = {
+        template: `
+            <div>
+                <h1>Vue v-for Example (Options API)</h1>
+                <div class="row">
+                    <div class="column">
+                        <h2>Items:</h2>
+                        <item-component :item="items"></item-component>
+                    </div>
+                    <div class="column">
+                        <h2>Numbers:</h2>
+                        <number-component :number="numbers"></number-component>
+                    </div>
+                </div>
+            <hr>
+            <form-component @add-item="addTheItemFromChildComponent" @add-number="addNumberItemFromChildComponent"></form-component>
+            </div>
+        `,
+        data() {
+            return {
+                items: ['House', 'Car', 'Phone'],
+                numbers: [1, 2, 3]
+            };
+        },
+        methods: {
+            // You can define methods here if needed
+            addNumberItemFromChildComponent(newNumber) {
+                this.numbers.push(newNumber);
+            }
+            ,
+            addTheItemFromChildComponent(newItem) {
+                this.items.push(newItem);
+            }
+        },
+        components: {
+            formComponent,
+            itemComponent,
+            numberComponent
+        }
+    }
+    createApp(maincomponent).mount('#app');
+    </script>
+</body>
+</html>

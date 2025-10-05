@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue v-for Example (Options API)</title>
+  <!-- 1. Include Vue from a CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+    }
+    #app {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      color: #1c3d5a;
+      padding-bottom: 0.5rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      border-bottom: 2px solid #eef;
+    }
+    form {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    input {
+      flex: 1;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9f9f9;
+      padding: 0.75rem;
+      border-bottom: 1px solid #e7e7e7;
+    }
+    li button {
+      padding: 0.3rem 0.6rem;
+      background-color: #dc3545;
+      font-size: 0.8rem;
+    }
+    li button:hover {
+      background-color: #c82333;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: #e7e7e7;
+      margin: 2rem 0;
+    }
+    .row {
+      display: flex;
+      gap: 2rem;
+    }
+    .column {
+      flex: 1;
+    }
+    .column h2 {
+      margin-top: 0;
+    }
+
+  </style>
+  </head>
+<body>
+  <!-- This is where your Vue app will be mounted -->
+<div id="app">
+
+</div>
+<script>
+    // 2. Create a Vue application
+    const { createApp } = Vue;
+    //createApp({object}).mount('#app');
+    const app = createApp();
+    const formComponent = {
+        template: `
+            <div class="row">
+                <div class="column">
+                    <h2>Add Item</h2>
+                    <form @submit.prevent="handleItemSubmit">
+                        <input v-model="itemValue" placeholder="Enter Item" />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+                <div class="column">
+                    <h2>Add Number</h2>
+                    <form @submit.prevent="handleSubmit">
+                        <input v-model="inputValue" placeholder="Enter Number" />
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        `,
+        data() {
+            return {
+                itemValue: '',
+                inputValue: ''
+            };
+        },
+        methods: {
+            handleSubmit() {
+                // enter the number into maincomponents numbers array
+                this.$emit('add-number', this.inputValue);
+                this.inputValue = '';
+            },
+            handleItemSubmit() {
+                // enter the item into maincomponents items array
+                this.$emit('add-item', this.itemValue);
+                this.itemValue = '';
+            }
+        }
+    }
+    const itemComponent = {
+        props: ['item'],
+        emits: ['delete-item'],
+        template: `<ul>
+            <li v-for="(singleItem, index) in item" :key="index">
+                <span>{{ singleItem }}</span>
+                <button @click="$emit('delete-item', index)">Delete</button>
+            </li>
+            </ul>`
+    }
+    const numberComponent = {
+        props: ['number'],
+        emits: ['delete-number'],
+        template: `<ul>
+            <li v-for="(num, index) in number" :key="index">
+                <span>{{ num }}</span>
+                <button @click="$emit('delete-number', index)">Delete</button>
+            </li>
+            </ul>`
+    }
+    const maincomponent = {
+        template: `
+            <div>
+                <h1>Vue v-for Example with state management with emit</h1>
+                <div class="row">
+                    <div class="column">
+                        <h2>Items:</h2>
+                        <item-component :item="items" @delete-item="deleteItem"></item-component>
+                    </div>
+                    <div class="column">
+                        <h2>Numbers:</h2>
+                        <number-component :number="numbers" @delete-number="deleteNumber"></number-component>
+                    </div>
+                </div>
+            <hr>
+            <form-component @add-number="addNumber" @add-item="addItem"></form-component>
+            </div>
+        `,
+        data() {
+            return {
+                items: ['House', 'Car', 'Phone'],
+                numbers: [1, 2, 3]
+            };
+        },
+        methods: {
+            // You can define methods here if needed
+            addNumber(newNumber) {
+                this.numbers.push(newNumber);
+            }
+            , // Note: a comma is fine here
+            addItem(newItem) {
+                this.items.push(newItem);
+            },
+            deleteItem(index) {
+                this.items.splice(index, 1);
+            },
+            deleteNumber(index) {
+                this.numbers.splice(index, 1);
+            },
+        },
+        components: {
+            formComponent,
+            itemComponent,
+            numberComponent
+        }
+    }
+    createApp(maincomponent).mount('#app');
+    </script>
+</body>
+</html>
