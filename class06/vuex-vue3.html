@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vuex in vue3 example</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vuex@next/dist/vuex.global.js"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <script>
+        const { createApp, ref, reactive, toRefs, computed, watch, provide, inject, onMounted, onBeforeMount, onBeforeUpdate, onUpdated, onBeforeUnmount, onUnmounted, onErrorCaptured, getCurrentInstance, nextTick, toRaw, toRef, unref, shallowRef, shallowReactive, shallowReadonly, readonly, isProxy, isReactive, isReadonly, isRef, proxyRefs, unwrapRef, watchEffect, watchPostEffect} = Vue;
+        const { createStore } = Vuex;
+        const store = createStore({
+            state() {
+                return {
+                    count: 0
+                }
+            },
+            mutations: {
+                increment(state) {
+                    state.count++;
+                }
+            },
+            actions: {
+                increment: ({ commit }) => {
+                    commit('increment');
+                }
+            },
+            getters: {
+                doubleCount(state) {
+                    return state.count * 2;
+                }
+            }
+        });
+
+        const app = createApp({
+            
+        }).use(store);
+        app.mount('#app');
+    </script>
+</body>
+</html>
