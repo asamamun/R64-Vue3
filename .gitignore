@@ -2,7 +2,12 @@
 /node_modules
 /src/**/node_modules
 /class04/**/node_modules
+/class05/**/node_modules
 /class06/**/node_modules
+/class07/**/node_modules
+/class08/**/node_modules
+/class09/**/node_modules
+/fresh-vue-install
 # zip directories
 /zip
 /zip/

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Router Multiple Views - Learning Guide</title>
+    <style>
+        :root {
+            --primary: #42b883;
+            --primary-dark: #359469;
+            --secondary: #35495e;
+            --light: #f6f8fa;
+            --dark: #2c3e50;
+            --gray: #6c757d;
+            --border: #e1e5e9;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f8f9fa;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .card h2 {
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .card h3 {
+            color: var(--secondary);
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        .code-block {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        
+        .code-comment {
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .example-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .example-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .example-card {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .example-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .note {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .tip {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .feature-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--secondary);
+            color: white;
+            margin-top: 3rem;
+        }
+        
+        .router-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .router-link:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .router-view-demo {
+            min-height: 200px;
+            border: 2px dashed var(--gray);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem 0;
+            background-color: rgba(66, 184, 131, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Vue Router Multiple Views</h1>
+        <p>Comprehensive Learning Guide for Named Router Views and Advanced Routing</p>
+    </header>
+
+    <div class="container">
+        <!-- Introduction -->
+        <div class="card">
+            <h2>Introduction to Multiple Views</h2>
+            <p>In Vue Router, the standard <code><router-view></code> component displays a single component based on the current route. However, sometimes you need to display <strong>multiple components simultaneously</strong> for the same URL.</p>
+            
+            <div class="note">
+                <strong>When to use multiple views:</strong> Dashboard layouts, complex page structures, or when you need different sections of your page to change independently based on the same route.
+            </div>
+            
+            <h3>What are Named Router Views?</h3>
+            <p>Named router views allow you to define <span class="highlight">multiple outlet points</span> in your template where different components can be rendered simultaneously for the same route.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Multiple Components</h4>
+                    <p>Render different components in different areas of your layout</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Layout Flexibility</h4>
+                    <p>Create complex layouts like dashboards, admin panels, etc.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Route Efficiency</h4>
+                    <p>Single route can control multiple view areas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Setup -->
+        <div class="card">
+            <h2>Basic Setup</h2>
+            
+            <h3>1. Template with Named Router Views</h3>
+            <p>Define multiple <code><router-view></code> elements with unique <code>name</code> attributes:</p>
+            
+            <div class="code-block">
+<template>
+  <div class="app">
+    <!-- Default router view (unnamed) -->
+    <router-view></router-view>
+    
+    <!-- Named router views -->
+    <router-view name="header"></router-view>
+    <router-view name="sidebar"></router-view>
+    <router-view name="main"></router-view>
+    <router-view name="footer"></router-view>
+  </div>
+</template>
+            </div>
+
+            <h3>2. Route Configuration</h3>
+            <p>Use the <code>components</code> property (plural) instead of <code>component</code> (singular):</p>
+            
+            <div class="code-block">
+const routes = [
+  {
+    path: '/dashboard',
+    <span class="highlight">components</span>: {
+      default: DashboardLayout,    // for unnamed router-view
+      header: DashboardHeader,     // for name="header"
+      sidebar: DashboardSidebar,   // for name="sidebar"
+      main: DashboardMain,         // for name="main"
+      footer: DashboardFooter      // for name="footer"
+    }
+  }
+]
+            </div>
+
+            <div class="warning">
+                <strong>Important:</strong> Use <code>components</code> (plural) in your route configuration when working with named views, not <code>component</code> (singular).
+            </div>
+        </div>
+
+        <!-- Practical Example -->
+        <div class="card">
+            <h2>Practical Example: Dashboard Layout</h2>
+            
+            <div class="example-container">
+                <div class="example-card">
+                    <h4>Template Structure</h4>
+                    <div class="code-block">
+<template>
+  <div class="dashboard">
+    <div class="header">
+      <router-view name="header"></router-view>
+    </div>
+    
+    <div class="content">
+      <div class="sidebar">
+        <router-view name="sidebar"></router-view>
+      </div>
+      <div class="main">
+        <router-view name="main"></router-view>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <router-view name="footer"></router-view>
+    </div>
+  </div>
+</template>
+                    </div>
+                </div>
+                
+                <div class="example-card">
+                    <h4>Route Configuration</h4>
+                    <div class="code-block">
+const routes = [
+  {
+    path: '/admin',
+    components: {
+      header: AdminHeader,
+      sidebar: AdminSidebar,
+      main: AdminDashboard,
+      footer: AdminFooter
+    }
+  },
+  {
+    path: '/admin/users',
+    components: {
+      header: AdminHeader,
+      sidebar: AdminSidebar,
+      main: UserManagement,
+      footer: AdminFooter
+    }
+  }
+]
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip">
+                <strong>Pro Tip:</strong> You can reuse the same components (like Header and Footer) across different routes while only changing the main content area.
+            </div>
+        </div>
+
+        <!-- Advanced Usage -->
+        <div class="card">
+            <h2>Advanced Usage Patterns</h2>
+            
+            <h3>1. Mixing Named and Default Views</h3>
+            <p>You can combine unnamed (default) and named router views in the same template:</p>
+            
+            <div class="code-block">
+<template>
+  <div>
+    <!-- This will render the 'default' component -->
+    <router-view></router-view>
+    
+    <!-- These will render named components -->
+    <router-view name="modal"></router-view>
+    <router-view name="notifications"></router-view>
+  </div>
+</template>
+
+<!-- Route config -->
+{
+  path: '/profile',
+  components: {
+    default: UserProfile,        // renders in unnamed router-view
+    modal: ProfileModal,         // renders in name="modal"
+    notifications: UserAlerts    // renders in name="notifications"
+  }
+}
+            </div>
+
+            <h3>2. Nested Named Views</h3>
+            <p>Named views can also be used with nested routes:</p>
+            
+            <div class="code-block">
+// Parent route with named views
+{
+  path: '/settings',
+  components: {
+    header: SettingsHeader,
+    main: SettingsLayout
+  },
+  children: [
+    {
+      path: 'account',
+      components: {
+        // These will render in SettingsLayout's router-views
+        default: AccountSettings,
+        sidebar: SettingsSidebar
+      }
+    }
+  ]
+}
+            </div>
+
+            <h3>3. Dynamic Component Loading</h3>
+            <p>Use dynamic imports for code splitting:</p>
+            
+            <div class="code-block">
+{
+  path: '/analytics',
+  components: {
+    header: () => import('./components/AnalyticsHeader.vue'),
+    sidebar: () => import('./components/AnalyticsSidebar.vue'),
+    main: () => import('./components/AnalyticsDashboard.vue')
+  }
+}
+            </div>
+        </div>
+
+        <!-- Common Use Cases -->
+        <div class="card">
+            <h2>Common Use Cases</h2>
+            
+            <h3>1. Dashboard Applications</h3>
+            <ul>
+                <li>Header with user info and notifications</li>
+                <li>Sidebar navigation menu</li>
+                <li>Main content area</li>
+                <li>Footer with copyright info</li>
+            </ul>
+
+            <h3>2. E-commerce Product Pages</h3>
+            <ul>
+                <li>Product gallery (main view)</li>
+                <li>Product details sidebar</li>
+                <li>Related products section</li>
+                <li>Customer reviews section</

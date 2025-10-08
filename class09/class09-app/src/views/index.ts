@@ -1,0 +1,6 @@
+export { default as ProductDetails } from './ProductDetails.vue'
+export { default as CartView } from './CartView.vue'
+export { default as DashboardHeader } from './DashboardHeader.vue'
+export { default as DashboardSidebar } from './DashboardSidebar.vue'
+export { default as DashboardMain } from './DashboardMain.vue'
+export { default as WishlistSidebar } from './WishlistSidebar.vue'

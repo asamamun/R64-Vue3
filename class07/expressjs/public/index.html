@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express.js Product & Cart API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .panel {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .product {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input {
+            width: 60px;
+            padding: 5px;
+        }
+        .order {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>Express.js Product & Cart API Test</h1>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>Products</h2>
+            <div id="products"></div>
+        </div>
+        
+        <div class="panel">
+            <h2>Your Cart</h2>
+            <div id="cart"></div>
+            <button id="placeOrder">Place Order</button>
+            <h3>Order History</h3>
+            <div id="orders"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simple test client for our API
+        const userId = 'user123'; // Fixed user ID for testing
+        
+        // Fetch and display products
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                
+                const productsDiv = document.getElementById('products');
+                productsDiv.innerHTML = '';
+                
+                products.forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'product';
+                    productDiv.innerHTML = `
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <p><strong>$${product.price.toFixed(2)}</strong></p>
+                        <button onclick="addToCart(${product.id})">Add to Cart</button>
+                    `;
+                    productsDiv.appendChild(productDiv);
+                });
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+        
+        // Add item to cart
+        async function addToCart(productId) {
+            try {
+                const response = await fetch(`/api/cart/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ productId, quantity: 1 })
+                });
+                
+                if (response.ok) {
+                    loadCart(); // Refresh cart display
+                } else {
+                    console.error('Failed to add to cart');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+            }
+        }
+        
+        // Load and display cart
+        async function loadCart() {
+            try {
+                const response = await fetch(`/api/cart/${userId}`);
+                const cartItems = await response.json();
+                
+                const cartDiv = document.getElementById('cart');
+                cartDiv.innerHTML = '';
+                
+                if (cartItems.length === 0) {
+                    cartDiv.innerHTML = '<p>Your cart is empty</p>';
+                    return;
+                }
+                
+                let total = 0;
+                
+                cartItems.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'cart-item';
+                    itemDiv.innerHTML = `
+                        <div>
+                            <h4>${item.name}</h4>
+                            <p>$${item.price.toFixed(2)} × 
+                                <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.productId}, this.value)">
+                            </p>
+                        </div>
+                        <div>
+                            <p><strong>$${itemTotal.toFixed(2)}</strong></p>
+                            <button onclick="removeFromCart(${item.productId})">Remove</button>
+                        </div>
+                    `;
+                    cartDiv.appendChild(itemDiv);
+                });
+                
+                const totalDiv = document.createElement('div');
+                totalDiv.className = 'cart-item';
+                totalDiv.innerHTML = `
+                    <h3>Total: $${total.toFixed(2)}</h3>
+                `;
+                cartDiv.appendChild(totalDiv);
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+        }
+        
+        // Update item quantity
+        async function updateQuantity(productId, quantity) {
+            try {
+                const response = await fetch(`/api/cart/${userId}/${productId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: parseInt(quantity) })
+                });
+                
+                if (response.ok) {
+                    loadCart(); // Refresh cart display
+                } else {
+                    console.error('Failed to update quantity');
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+            }
+        }
+        
+        // Remove item from cart
+        async function removeFromCart(productId) {
+            try {
+                const response = await fetch(`/api/cart/${userId}/${productId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadCart(); // Refresh cart display
+                } else {
+                    console.error('Failed to remove from cart');
+                }
+            } catch (error) {
+                console.error('Error removing from cart:', error);
+            }
+        }
+        
+        // Place order
+        async function placeOrder() {
+            try {
+                const response = await fetch(`/api/orders/${userId}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    alert('Order placed successfully!');
+                    loadCart(); // Refresh cart display
+                    loadOrders(); // Refresh orders display
+                } else {
+                    const error = await response.json();
+                    alert('Error placing order: ' + error.message);
+                }
+            } catch (error) {
+                console.error('Error placing order:', error);
+                alert('Error placing order');
+            }
+        }
+        
+        // Load and display orders
+        async function loadOrders() {
+            try {
+                const response = await fetch(`/api/orders/${userId}`);
+                const orders = await response.json();
+                
+                const ordersDiv = document.getElementById('orders');
+                ordersDiv.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    ordersDiv.innerHTML = '<p>No order history</p>';
+                    return;
+                }
+                
+                orders.forEach(order => {
+                    const orderDiv = document.createElement('div');
+                    orderDiv.className = 'order';
+                    
+                    let itemsHtml = '';
+                    let orderTotal = 0;
+                    
+                    order.items.forEach(item => {
+                        const itemTotal = item.price * item.quantity;
+                        orderTotal += itemTotal;
+                        itemsHtml += `<p>${item.name} × ${item.quantity} = $${itemTotal.toFixed(2)}</p>`;
+                    });
+                    
+                    orderDiv.innerHTML = `
+                        <h4>Order #${order.orderId}</h4>
+                        <p><strong>Date:</strong> ${new Date(order.timestamp).toLocaleString()}</p>
+                        <div>${itemsHtml}</div>
+                        <p><strong>Total: $${orderTotal.toFixed(2)}</strong></p>
+                    `;
+                    ordersDiv.appendChild(orderDiv);
+                });
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            loadCart();
+            loadOrders();
+            
+            // Setup event listener for place order button
+            document.getElementById('placeOrder').addEventListener('click', placeOrder);
+        });
+    </script>
+</body>
+</html>

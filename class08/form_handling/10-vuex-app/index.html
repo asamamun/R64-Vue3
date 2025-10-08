@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="../public/semantic.min.css" />
+  <title>10_Vuex_App</title>
+  <style>
+    .ui.container {
+      margin: 20px 0;
+    }
+    .input-form {
+      max-width: 500px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="ui container">
+    <h2 class="ui header">Fullstack Clothing Inquiry Sheet</h2>
+    <input-form></input-form>
+    <another-component></another-component>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/vuex@4"></script>
+  <script src="./store.js"></script>
+  <script src="./another-component.js"></script>
+  <script src="./main.js"></script>
+  <script>
+    // Make AnotherComponent available globally
+    window.AnotherComponent = AnotherComponent;
+    
+    Vue.createApp({
+  components: {
+    'input-form': InputForm,
+    'another-component': AnotherComponent
+  }
+}).use(store).mount('#app')
+  </script>
+</body>
+</html>

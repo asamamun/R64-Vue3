@@ -1,0 +1,66 @@
+<template>
+  <div>
+    <h1>{{ title }}</h1>
+    <p>{{ reversedMessage }}</p>
+    <input v-model="message" />
+    <button @click="increment">Count: {{ count }}</button>
+  </div>
+</template>
+
+<script>
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+
+export default {
+  name: 'CounterComponent',
+  
+  props: {
+    initialCount: {
+      type: Number,
+      default: 0
+    }
+  },
+  
+  emits: ['update'],
+  
+  setup(props, { emit }) {
+    // Reactive data
+    const message = ref('Hello World');
+    const count = ref(props.initialCount);
+    
+    // Computed property
+    const reversedMessage = computed(() => {
+      return message.value.split('').reverse().join('');
+    });
+    
+    // Method
+    const increment = () => {
+      count.value++;
+      emit('update', count.value);
+    };
+    
+    // Watcher
+    watch(count, (newVal) => {
+      if (newVal > 10) {
+        console.log('Count is getting high!');
+      }
+    });
+    
+    // Lifecycle hooks
+    onMounted(() => {
+      console.log('Component mounted');
+    });
+    
+    onBeforeUnmount(() => {
+      console.log('Component will be unmounted');
+    });
+    
+    // Return everything that should be available in template
+    return {
+      message,
+      count,
+      reversedMessage,
+      increment
+    };
+  }
+};
+</script>

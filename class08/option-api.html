@@ -1,0 +1,63 @@
+<template>
+  <div>
+    <h1>{{ title }}</h1>
+    <p>{{ reversedMessage }}</p>
+    <input v-model="message" />
+    <button @click="increment">Count: {{ count }}</button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'CounterComponent',
+  
+  props: {
+    initialCount: {
+      type: Number,
+      default: 0
+    }
+  },
+  
+  data() {
+    return {
+      message: 'Hello World',
+      count: this.initialCount
+    };
+  },
+  
+  computed: {
+    reversedMessage() {
+      return this.message.split('').reverse().join('');
+    }
+  },
+  
+  methods: {
+    increment() {
+      this.count++;
+      this.$emit('update', this.count);
+    }
+  },
+  
+  watch: {
+    count(newVal) {
+      if (newVal > 10) {
+        console.log('Count is getting high!');
+      }
+    }
+  },
+  
+  created() {
+    console.log('Component created');
+  },
+  
+  mounted() {
+    console.log('Component mounted');
+  },
+  
+  beforeUnmount() {
+    console.log('Component will be unmounted');
+  },
+  
+  emits: ['update']
+};
+</script>
